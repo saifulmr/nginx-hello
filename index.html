@@ -58,21 +58,26 @@ div.check {
 </style>
 <script>
 var ref;
-function checkRefresh(){
-    if (document.cookie == "refresh=1") {
+async function checkRefresh(){
+    var refresh = await cookieStore.get("refresh");
+    if (refresh.value == "1") {
         document.getElementById("check").checked = true;
         ref = setTimeout(function(){location.reload();}, 1000);
     } else {
     }
 }
-function changeCookie() {
+async function changeCookie() {
     if (document.getElementById("check").checked) {
-        document.cookie = "refresh=1";
+        await cookieStore.set("refresh", "1");
         ref = setTimeout(function(){location.reload();}, 1000);
     } else {
-        document.cookie = "refresh=0";
+        await cookieStore.set("refresh", "0");
         clearTimeout(ref);
     }
+}
+async function deleteSessionCookie() {
+	await cookieStore.delete("session");
+	location.reload();
 }
 </script>
 </head>
@@ -88,7 +93,10 @@ function changeCookie() {
 <p class="smaller"><span>Remote-Address:</span> <span>remote_address</span></p>
 <p class="smaller"><span>X-Forwarded-For:</span> <span>http_x_forwarded_for</span></p>
 </div>
-<div class="check"><input type="checkbox" id="check" onchange="changeCookie()"> Auto Refresh</div>
+<div class="check">
+	<p><input type="checkbox" id="check" onchange="changeCookie()"/> Auto Refresh</p>
+	<p><button type="button" onclick="deleteSessionCookie()">Delete Session Cookie</button></p>
+</div>
     <div id="footer">
         <div id="center" align="center">
             Request ID: request_id<br/>
